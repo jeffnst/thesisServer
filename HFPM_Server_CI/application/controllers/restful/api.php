@@ -65,6 +65,12 @@ class Api extends REST_Controller
 	        }
 	        
 	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `central_db`.`stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
 	        // this array is the JSON root element
 	        /*
 		     $users = array(
