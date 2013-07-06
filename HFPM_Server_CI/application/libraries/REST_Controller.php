@@ -985,11 +985,11 @@ abstract class REST_Controller extends CI_Controller
 	*/
 	protected function _perform_ldap_auth($username = '', $password = NULL)
 	{
-	if (empty($username))
-	{
-	log_message('debug', 'LDAP Auth: failure, empty username');
-	return false;
-	}
+		if (empty($username))
+		{
+			log_message('debug', 'LDAP Auth: failure, empty username');
+			return false;
+		}
 	
 	log_message('debug', 'LDAP Auth: Loading Config');
 	

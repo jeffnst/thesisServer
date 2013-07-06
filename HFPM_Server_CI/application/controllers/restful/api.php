@@ -68,7 +68,7 @@ class Api extends REST_Controller
 	        // increase number of queries (tracking pusposes)
 	        //$query_string = "TRUNCATE `stat_activity`;";
 	        //$con->query($query_string);
-	        $query_string = "UPDATE `central_db`.`stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
 	        $con->query($query_string);
 	        
 	        // this array is the JSON root element
@@ -97,21 +97,40 @@ class Api extends REST_Controller
 	        }
 	    }
 	    
+	    
+	    
+	    
 	    function user_post()
 	    {
-	        //$this->some_model->updateUser( $this->get('id') );
-	        $message = array('id' => $this->get('id'), 'name' => $this->post('name'), 'email' => $this->post('email'), 'message' => 'ADDED!');
 	        
-	        $this->response($message, 200); // 200 being the HTTP response code
+	    	$con = connect_db('central_db');
+	    	
+	    	$username = $this->get('username');
+	    	$password = $this->get('password');
+	    	$email = $this->get('email');
+	    	$userteam = $this->get('userteam');
+	    	$name = $this->get('name');
+	    	$surname = $this->get('surname');
+	    	$amka = $this->get('amka');
+	    	$status = $this->get('status');
+	    	$department = $this->get('department');
+	    	
+	    	// main query
+	    	$query_string = "UPDATE `users` SET `password`='".$password."', `email`='".$email."', `user_team`='".$userteam."', `name_user`='".$name."', `surname_user`='".$surname."', `amka`='".$amka."', `status`='".$status."', `department`='".$department."' WHERE `username`='".$username."';";
+	        $con->query($query_string);
+	    	
+	        // increase queries
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        $this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
 	    }
 	    
-	    function user_delete()
-	    {
-	     //$this->some_model->deletesomething( $this->get('id') );
-	        $message = array('id' => $this->get('id'), 'message' => 'DELETED!');
-	        
-	        $this->response($message, 200); // 200 being the HTTP response code
-	    }
+	    
+	    
+	    
+	    
+	    
 	    
 	    function users_get()
 	    {
@@ -134,19 +153,15 @@ class Api extends REST_Controller
 	    }
 	
 	
-	public function send_post()
-	{
-	var_dump($this->request->body);
-	}
-	
-	
-	public function send_put()
-	{
-	var_dump($this->put('foo'));
-	}
+		public function send_post()
+		{
+			var_dump($this->request->body);
+		}
+		
+		
+		public function send_put()
+		{
+			var_dump($this->put('foo'));
+		}
+		
 }
-
-// ---------------------------------------------------------------------------------------------------------------------------------------------------- //
-		    
-		    
-// ---------------------------------------------------------------------------------------------------------------------------------------------------- //
