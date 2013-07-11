@@ -103,23 +103,38 @@ class Api extends REST_Controller
 	    function user_post()
 	    {
 	        
-	    	$con = connect_db('central_db');
+	    	/*
+	    	$json_from_phone = json_decode($this->request->body);
+	    	
+	    	$username = $json_from_phone->username;
+	    	$password = $json_from_phone->password;
+	    	$email = $json_from_phone->email;
+	    	$userteam = $json_from_phone->userteam;
+	    	$name = $json_from_phone->name;
+	    	$surname = $json_from_phone->surname;
+	    	$amka = $json_from_phone->amka;
+	    	$status = $json_from_phone->status;
+	    	$department = $json_from_phone->department;
+	    	*/
 	    	
 	    	$username = $this->get('username');
-	    	$password = $this->get('password');
-	    	$email = $this->get('email');
-	    	$userteam = $this->get('userteam');
-	    	$name = $this->get('name');
-	    	$surname = $this->get('surname');
-	    	$amka = $this->get('amka');
-	    	$status = $this->get('status');
-	    	$department = $this->get('department');
+			$password = $this->post('password');
+			$email = $this->post('email');
+			$userteam = $this->post('user_team');
+			$name = $this->post('name_user');
+			$surname = $this->post('surname_user');
+			$amka = $this->post('amka');
+			$status = $this->post('status');
+			$department = $this->post('department');
+			
+			
 	    	
+	    	$con = connect_db('central_db');
 	    	// main query
 	    	$query_string = "UPDATE `users` SET `password`='".$password."', `email`='".$email."', `user_team`='".$userteam."', `name_user`='".$name."', `surname_user`='".$surname."', `amka`='".$amka."', `status`='".$status."', `department`='".$department."' WHERE `username`='".$username."';";
-	        $con->query($query_string);
+	    	$con->query($query_string);
 	    	
-	        // increase queries
+	        // increase queries (testing purposes)
 	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
 	        $con->query($query_string);
 	        
