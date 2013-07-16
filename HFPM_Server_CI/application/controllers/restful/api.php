@@ -103,19 +103,6 @@ class Api extends REST_Controller
 	    function user_post()
 	    {
 	        
-	    	/*
-	    	$json_from_phone = json_decode($this->request->body);
-	    	
-	    	$username = $json_from_phone->username;
-	    	$password = $json_from_phone->password;
-	    	$email = $json_from_phone->email;
-	    	$userteam = $json_from_phone->userteam;
-	    	$name = $json_from_phone->name;
-	    	$surname = $json_from_phone->surname;
-	    	$amka = $json_from_phone->amka;
-	    	$status = $json_from_phone->status;
-	    	$department = $json_from_phone->department;
-	    	*/
 	    	
 	    	$username = $this->get('username');
 			$password = $this->post('password');
@@ -140,6 +127,249 @@ class Api extends REST_Controller
 	        
 	        $this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
 	    }
+	    
+	    
+	    
+	    
+	    
+		function address_get()
+	    {
+	        /*
+	    	if(!$this->get('id'))
+	        {
+	         $this->response(NULL, 400);
+	        } 
+			*/
+	        // $user = $this->some_model->getSomething( $this->get('id') );
+	        
+	        // connect to DB
+	        $con = connect_db('central_db');
+	        
+	        
+	        //var_dump($this->get('status'));
+	        
+	        // define query
+	        $query_string = "SELECT * FROM address AS a INNER JOIN users AS u ON a.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        //var_dump($query_string);
+	        // execute query
+	        $result = $con->query($query_string);
+	        //var_dump($result);
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['user_id']);
+	        	
+	        	$address[$id] = array(
+						           'id' => $id,
+						           'nomos' => $row['nomos'],
+						           'dimos' => $row['dimos'],
+						           'city' => $row['city'],
+						           'address' => $row['address'],
+						           'postal_code' => $row['tk'],
+						           'area' => $row['perioxi'],
+						           'country' => $row['xwra']
+	        					   
+	        	);
+	        	
+	        }
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        // this array is the JSON root element
+	        /*
+		     $users = array(
+				1 => array('id' => 1, 'name' => $username[1], 'email' => 'example1@example.com', 'fact' => 'Loves swimming'),
+				2 => array('id' => 2, 'name' => $username[2], 'email' => 'example2@example.com', 'fact' => 'Has a huge face'),
+				3 => array('id' => 3, 'name' => $username[3], 'email' => 'example3@example.com', 'fact' => 'Is a Scott!', array('hobbies' => array('jogging', 'bikes'))),
+			);
+			*/
+			
+			
+
+		    
+		    
+		     $addr = @$address[$id];
+	    
+	        if($addr)
+	        {
+	            $this->response($addr, 200); // 200 being the HTTP response code
+	        }
+	
+	        else
+	        {
+	            $this->response(array('error' => 'User could not be found'), 404);
+	        }
+	    }
+	    
+	    
+	    
+	    
+	    function address_post()
+	    {
+	        
+	    	
+	    	$username = $this->get('username');
+			$nomos = $this->post('nomos');
+			$dimos = $this->post('dimos');
+			$city = $this->post('city');
+			$address = $this->post('address');
+			$postal_code = $this->post('postal_code');
+			$area = $this->post('area');
+			$country = $this->post('country');
+			
+	    	
+			$con = connect_db('central_db');
+			
+			$query_string = "SELECT * FROM users WHERE username = '".$this->get('username')."'";
+	    	$result = $con->query($query_string);
+	    	
+	    	$row = $result->fetch_array();
+	    	$user_id = intval($row['user_id']);
+			
+	    	// main query
+	    	$query_string  = "UPDATE `address` SET `nomos`='".$nomos."', `dimos`='".$dimos."', `city`='".$city."', `address`='".$address."',";
+	    	$query_string .= " `tk`='".$postal_code."', `perioxi`='".$area."', `xwra`='".$country."' WHERE `user_id`='".$user_id."';";
+	    	$con->query($query_string);
+	    	
+	        // increase queries (testing purposes)
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        $this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+		function phones_get()
+	    {
+	        
+	        // connect to DB
+	        $con = connect_db('central_db');
+	        
+	        
+	        //var_dump($this->get('status'));
+	        
+	        // define query
+	        $query_string = "SELECT * FROM phone_numbers AS p INNER JOIN users AS u ON p.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        //var_dump($query_string);
+	        // execute query
+	        $result = $con->query($query_string);
+	        //var_dump($result);
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['user_id']);
+	        	
+	        	$phones[$id] = array(
+						           'id' => $id,
+						           'phone' => $row['telephone'],
+						           'mobile' => $row['mobile'],
+						           'fax' => $row['fax']
+	        	);
+	        	
+	        }
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        // this array is the JSON root element
+	        /*
+		     $users = array(
+				1 => array('id' => 1, 'name' => $username[1], 'email' => 'example1@example.com', 'fact' => 'Loves swimming'),
+				2 => array('id' => 2, 'name' => $username[2], 'email' => 'example2@example.com', 'fact' => 'Has a huge face'),
+				3 => array('id' => 3, 'name' => $username[3], 'email' => 'example3@example.com', 'fact' => 'Is a Scott!', array('hobbies' => array('jogging', 'bikes'))),
+			);
+			*/
+			
+			
+
+		    
+		    
+		     $ph = @$phones[$id];
+	    
+	        if($ph)
+	        {
+	            $this->response($ph, 200); // 200 being the HTTP response code
+	        }
+	
+	        else
+	        {
+	            $this->response(array('error' => 'User could not be found'), 404);
+	        }
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    function phones_post()
+	    {
+	        
+	    	
+	    	$username = $this->get('username');
+			$phone = $this->post('phone');
+			$mobile = $this->post('mobile');
+			$fax = $this->post('fax');
+			
+	    	
+			$con = connect_db('central_db');
+			
+			$query_string = "SELECT * FROM users WHERE username = '".$this->get('username')."'";
+	    	$result = $con->query($query_string);
+	    	
+	    	$row = $result->fetch_array();
+	    	$user_id = intval($row['user_id']);
+			
+	    	// main query
+	    	$query_string  = "UPDATE `phone_numbers` SET `telephone`='".$phone."', `mobile`='".$mobile."', `fax`='".$fax."' WHERE `user_id`='".$user_id."';";
+	    	$con->query($query_string);
+	    	
+	        // increase queries (testing purposes)
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        $this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
+	    } 
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
 	    
 	    
 	    
