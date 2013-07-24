@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 16, 2013 at 08:22 PM
+-- Generation Time: Jul 24, 2013 at 07:55 PM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.4.3
 
@@ -141,10 +141,10 @@ CREATE TABLE IF NOT EXISTS `departments` (
 --
 
 INSERT INTO `departments` (`id`, `department_name`) VALUES
-(2, 'GENIKO_NOSOKOMEIO_AIGIOU'),
-(1, 'SWTIRIA'),
-(3, 'ΚΑΠΟΥ'),
-(4, 'ΝΟΣΟΚΟΜΕΙΟ ΓΕΝΙΚΟ ΠΟΛΥΚΛΙΝΙΚΗ ΑΘΗΝΩΝ');
+(3, 'Ακτινολογικό Τμήμα'),
+(1, 'Καρδιολογικό Τμήμα'),
+(2, 'Παθολογικό Τμήμα'),
+(4, 'Τμήμα Διαχείρισης Προσωπικού');
 
 -- --------------------------------------------------------
 
@@ -210,7 +210,14 @@ CREATE TABLE IF NOT EXISTS `locations` (
   `location_name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `location_name` (`location_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `locations`
+--
+
+INSERT INTO `locations` (`id`, `location_name`) VALUES
+(1, 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική');
 
 -- --------------------------------------------------------
 
@@ -283,7 +290,19 @@ CREATE TABLE IF NOT EXISTS `program` (
   PRIMARY KEY (`program_id`),
   KEY `user_id` (`user_id`),
   KEY `location` (`location`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+
+--
+-- Dumping data for table `program`
+--
+
+INSERT INTO `program` (`program_id`, `date`, `duty_type`, `duty_start_time`, `duty_end_time`, `location`, `user_id`, `program_name`) VALUES
+(1, '2013-07-02', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(2, '2013-07-07', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(3, '2013-07-09', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(4, '2013-07-04', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(6, '2013-07-25', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(7, '2013-08-03', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6');
 
 -- --------------------------------------------------------
 
@@ -302,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `stat_activity` (
 --
 
 INSERT INTO `stat_activity` (`num_of_queries`, `last_happened_on`) VALUES
-(358, '2013-07-16 19:44:16');
+(577, '2013-07-24 19:54:04');
 
 -- --------------------------------------------------------
 
@@ -348,10 +367,10 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`user_id`, `user_team`, `name_user`, `surname_user`, `username`, `password`, `email`, `amka`, `status`, `department`) VALUES
-(1, 1, 'Spirydon', 'Iatropoulos', 'siatrop', 's.iatrop.0', 'siatrop@gmail.com', '1204196901789', 'active', 'SWTIRIA'),
-(2, 2, 'Vasileios', 'Lampropoulos', 'lampropoul', '12', 'lampropoul@live.com', '12048901859', 'active', 'GENIKO_NOSOKOMEIO_AIGIOU'),
-(3, 1, 'Kostas', 'Dim', 'q', 'q', 'qw@qw.gr', '12848264188612', 'on_vacation', 'ΚΑΠΟΥ'),
-(4, 2, 'Vasileios', 'Papadopoulos', 'vpapadopou', '123', 'vapapadopou@gmail.com', '6734220087756', 'active', 'ΝΟΣΟΚΟΜΕΙΟ ΓΕΝΙΚΟ ΠΟΛΥΚΛΙΝΙΚΗ ΑΘΗΝΩΝ');
+(1, 1, 'Spirydon', 'Iatropoulos', 'siatrop', 's.iatrop.0', 'siatrop@gmail.com', '1204196901789', 'active', 'Καρδιολογικό Τμήμα'),
+(2, 2, 'Vasileios', 'Lampropoulos', 'lampropoul', '12', 'lampropoul@live.com', '12048901859', 'active', 'Παθολογικό Τμήμα'),
+(3, 3, 'Kostas', 'Dim', 'q', 'q', 'qw@qw.gr', '12848264188612', 'on_vacation', 'Ακτινολογικό Τμήμα'),
+(4, 2, 'Vasileios', 'Papadopoulos', 'vpapadopou', '123', 'vapapadopou@gmail.com', '6734220087756', 'active', 'Τμήμα Διαχείρισης Προσωπικού');
 
 -- --------------------------------------------------------
 
@@ -363,15 +382,16 @@ CREATE TABLE IF NOT EXISTS `user_team` (
   `team_name` varchar(50) NOT NULL,
   `team_id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`team_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `user_team`
 --
 
 INSERT INTO `user_team` (`team_name`, `team_id`) VALUES
-('DoctorsTeam', 1),
-('Engineerteam', 2);
+('doctor', 1),
+('nurse', 2),
+('computer_staff', 3);
 
 --
 -- Constraints for dumped tables
@@ -411,16 +431,16 @@ ALTER TABLE `declared_duties`
 -- Constraints for table `declared_locations`
 --
 ALTER TABLE `declared_locations`
-  ADD CONSTRAINT `declared_locations_ibfk_2` FOREIGN KEY (`id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `declared_locations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `declared_locations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `declared_locations_ibfk_2` FOREIGN KEY (`id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `doctor_users`
 --
 ALTER TABLE `doctor_users`
-  ADD CONSTRAINT `doctor_users_ibfk_3` FOREIGN KEY (`eidikotita`) REFERENCES `eidikotites` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `doctor_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `doctor_users_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `user_team` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `doctor_users_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `user_team` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `doctor_users_ibfk_3` FOREIGN KEY (`eidikotita`) REFERENCES `eidikotites` (`name`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `eidikotites`
@@ -444,8 +464,8 @@ ALTER TABLE `phone_numbers`
 -- Constraints for table `program`
 --
 ALTER TABLE `program`
-  ADD CONSTRAINT `program_ibfk_2` FOREIGN KEY (`location`) REFERENCES `locations` (`location_name`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `program_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `program_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `program_ibfk_2` FOREIGN KEY (`location`) REFERENCES `locations` (`location_name`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `update_user`
@@ -457,8 +477,8 @@ ALTER TABLE `update_user`
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`department`) REFERENCES `departments` (`department_name`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`user_team`) REFERENCES `user_team` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`user_team`) REFERENCES `user_team` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`department`) REFERENCES `departments` (`department_name`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

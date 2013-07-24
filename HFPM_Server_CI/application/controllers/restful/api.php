@@ -50,7 +50,7 @@ class Api extends REST_Controller
 	        	
 	        	$users[$id] = array(
 						           'id' => $id,
-						           'user_team' => $row['user_team'],
+						           'user_team' => intval($row['user_team']),
 						           'name_user' => $row['name_user'],
 						           'surname_user' => $row['surname_user'],
 						           'username' => $row['username'],
@@ -125,7 +125,43 @@ class Api extends REST_Controller
 	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
 	        $con->query($query_string);
 	        
-	        $this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
+	        //$this->response(array('message'=>'Updated'), 200); // 200 being the HTTP response code
+	        
+	        
+	        // retreive updated
+	        
+	    	// define query
+	        $query_string = "SELECT * FROM users WHERE username = '".$username."'";
+	        //var_dump($query_string);
+	        // execute query
+	        $result = $con->query($query_string);
+	        //var_dump($result);
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['user_id']);
+	        	
+	        	$users[$id] = array(
+						           'id' => $id,
+						           'user_team' => intval($row['user_team']),
+						           'name_user' => $row['name_user'],
+						           'surname_user' => $row['surname_user'],
+						           'username' => $row['username'],
+						           'password' => $row['password'],
+						           'email' => $row['email'],
+						           'amka' => $row['amka'],
+						           'status' => $row['status'],
+						           'department' => $row['department'],
+	        						'message' => 'Updated'
+	        					   
+	        	);
+	        	
+	        }
+	        
+	        $this->response($users[$id], 200);
+	        
 	    }
 	    
 	    
@@ -356,7 +392,72 @@ class Api extends REST_Controller
 	    
 	    
 	    
+		function program_get()
+	    {
+	        /*
+	    	if(!$this->get('id'))
+	        {
+	         $this->response(NULL, 400);
+	        } 
+			*/
+	        // $user = $this->some_model->getSomething( $this->get('id') );
+	        
+	        // connect to DB
+	        $con = connect_db('central_db');
+	        
+	        
+	        //var_dump($this->get('status'));
+	        
+	        // define query
+	        $query_string = "SELECT * FROM program AS p INNER JOIN users AS u ON p.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        //var_dump($query_string);
+	        // execute query
+	        $result = $con->query($query_string);
+	        //var_dump($result);
+	        
+	        $prog = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['program_id']);
+	        	
+	        	$program[$id] = array(
+						           'id' => $id,
+						           'date' => $row['date'],
+						           'duty_type' => $row['duty_type'],
+						           'duty_start_time' => $row['duty_start_time'],
+						           'duty_end_time' => $row['duty_end_time'],
+						           'location' => $row['location'],
+						           'user_id' => intval($row['user_id']),
+						           'program_name' => $row['program_name']
+	        					   
+	        	);
+	        	
+	        	$prog["programs"][] = @$program[$id];
+	        	
+	        }
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
 	    
+	        if($prog)
+	        {
+	            $this->response($prog, 200); // 200 being the HTTP response code
+	        }
+	
+	        else
+	        {
+	            $this->response(array('error' => 'No program for this user.'), 404);
+	        }
+	    }
 	    
 	    
 	    
