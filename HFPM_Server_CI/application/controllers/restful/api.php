@@ -409,7 +409,8 @@ class Api extends REST_Controller
 	        //var_dump($this->get('status'));
 	        
 	        // define query
-	        $query_string = "SELECT * FROM program AS p INNER JOIN users AS u ON p.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        $query_string  = "SELECT * FROM program AS p INNER JOIN users AS u ON p.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        $query_string .= " ORDER BY p.date DESC";
 	        //var_dump($query_string);
 	        // execute query
 	        $result = $con->query($query_string);
@@ -468,6 +469,80 @@ class Api extends REST_Controller
 	    
 	    
 	    
+	    function change_post()
+	    {
+	        
+	    	
+	    	$id = intval($this->get('id'));
+			$user_id = intval($this->post('user_id'));
+			$request_date = $this->post('request_date');
+			$request_start_time = $this->post('request_start_time');
+			
+	    	
+			$con = connect_db('central_db');
+			
+	    	// main query
+	    	$query_string  = "INSERT INTO `change_list` VALUES(".$id.", ".$user_id.", '".$request_date."', '".$request_start_time."')";
+	    	$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date."', `request_start_time`='".$request_start_time."'";
+	    	$con->query($query_string);
+	    	
+	        // increase queries (testing purposes)
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	    // define query
+	        $query_string = "SELECT * FROM change_list WHERE id = '".$id."'";
+	        //var_dump($query_string);
+	        // execute query
+	        $result = $con->query($query_string);
+	        //var_dump($result);
+	        
+	        $prog = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['id']);
+	        	
+	        	$change_list[$id] = array(
+						           'id' => $id,
+						           'user_id' => $row['user_id'],
+						           'request_date' => $row['request_date'],
+						           'request_start_time' => $row['request_start_time']
+	        					   
+	        	);
+	        	
+	        	
+	        	
+	        }
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        $list = @$change_list[$id];
+	        
+	    
+	        if($list)
+	        {
+	        	 $list['message'] = 'InsertedOrUpdated'; 
+	            $this->response($list, 200); // 200 being the HTTP response code
+	        }
+	
+	        else
+	        {
+	            $this->response(array('error' => 'No program for this user.'), 404);
+	        }
+	        
+	        
+	        
+	    } 
 	    
 	    
 	    
@@ -477,7 +552,63 @@ class Api extends REST_Controller
 	    
 	    
 	    
+	    function changes_post()
+	    {
+	        
+	    	$changes = $this->post('changes');
+	    	$size = intval($this->post('size'));
+	    	
+	    	$id = array($size);
+	    	$user_id = array($size);
+	    	$request_date = array($size);
+	    	$request_date = array($size);
+	    	
+	    	for ($i=0; $i<$size; $i++)
+	    	{
+	    		$id[$i] = $changes[$i]['id'];
+	    		//var_dump($id[$i]);
+				$user_id[$i] = $changes[$i]['user_id'];
+				//var_dump($user_id[$i]);
+				$request_date[$i] = $changes[$i]['request_date'];
+				//var_dump($request_date[$i]);
+				$request_start_time[$i] = $changes[$i]['request_start_time'];
+				//var_dump($request_start_time[$i]);
+	    	}
+	    	
+			
+	    	
+			$con = connect_db('central_db');
+			
+			
+			for ($i=0; $i<$size; $i++)
+			{
+		    	// main query
+		    	$query_string  = "INSERT INTO `change_list` VALUES(".$id[$i].", ".$user_id[$i].", '".$request_date[$i]."', '".$request_start_time[$i]."')";
+		    	$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date[$i]."', `request_start_time`='".$request_start_time[$i]."'";
+		    	$con->query($query_string);
+		    	
+		        // increase queries (testing purposes)
+		        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+		        $con->query($query_string);
+		        
+			}
+	        
+	        
+	        
+			$this->response(array('message' => 'InsertedOrUpdated'), 200);
+	        
+	        
+	    } 
 	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    /*
 	    function users_get()
 	    {
 	        //$users = $this->some_model->getSomething( $this->get('limit') );
@@ -509,5 +640,9 @@ class Api extends REST_Controller
 		{
 			var_dump($this->put('foo'));
 		}
-		
+		*/
+	    
+	    
+	    
+	    
 }

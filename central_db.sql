@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 24, 2013 at 07:55 PM
+-- Generation Time: Jul 27, 2013 at 08:45 PM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.4.3
 
@@ -83,6 +83,18 @@ CREATE TABLE IF NOT EXISTS `change_list` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `change_list`
+--
+
+INSERT INTO `change_list` (`id`, `user_id`, `request_date`, `request_start_time`) VALUES
+(1, 3, '2013-07-27', '23:15:34'),
+(2, 3, '0000-00-00', '18:34:24'),
+(3, 3, '2013-07-27', '19:06:38'),
+(4, 3, '2013-07-29', '19:08:03'),
+(6, 3, '2013-08-02', '18:45:04'),
+(7, 3, '2013-08-04', '11:43:28');
 
 -- --------------------------------------------------------
 
@@ -290,7 +302,7 @@ CREATE TABLE IF NOT EXISTS `program` (
   PRIMARY KEY (`program_id`),
   KEY `user_id` (`user_id`),
   KEY `location` (`location`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
 
 --
 -- Dumping data for table `program`
@@ -302,7 +314,8 @@ INSERT INTO `program` (`program_id`, `date`, `duty_type`, `duty_start_time`, `du
 (3, '2013-07-09', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
 (4, '2013-07-04', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
 (6, '2013-07-25', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
-(7, '2013-08-03', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6');
+(7, '2013-08-03', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(8, '2013-07-22', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6');
 
 -- --------------------------------------------------------
 
@@ -321,7 +334,7 @@ CREATE TABLE IF NOT EXISTS `stat_activity` (
 --
 
 INSERT INTO `stat_activity` (`num_of_queries`, `last_happened_on`) VALUES
-(577, '2013-07-24 19:54:04');
+(1083, '2013-07-27 20:44:07');
 
 -- --------------------------------------------------------
 
