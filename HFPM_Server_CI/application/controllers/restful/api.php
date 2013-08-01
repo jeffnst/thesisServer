@@ -410,6 +410,7 @@ class Api extends REST_Controller
 	        
 	        // define query
 	        $query_string  = "SELECT * FROM program AS p INNER JOIN users AS u ON p.user_id=u.user_id WHERE u.username = '".$this->get('username')."'";
+	        $query_string .= " AND p.date >= CURRENT_DATE";
 	        $query_string .= " ORDER BY p.date DESC";
 	        //var_dump($query_string);
 	        // execute query
@@ -599,6 +600,225 @@ class Api extends REST_Controller
 	        
 	        
 	    } 
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function search_post()
+	    {
+	    	
+	    	
+	    	$id = $this->get('id');
+	    	$date = $this->post('date');
+	    	$duty_type = $this->post('type');
+	    	$location = $this->post('location');
+	    	$program_name = $this->post('progname');
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	
+	    	$query_string  = "SELECT * FROM program ";
+	    	
+	    	if ($date == 'Any')
+	    	{
+	    		$date = date("Y-m-d");
+	    		$query_string .= " WHERE date >= '".$date."'";
+	    		
+	    		if ($duty_type != 'All') $query_string .= " AND duty_type = '".$duty_type."'";
+	    		if ($location != 'All') $query_string .= " AND location = '".$location."'";
+	    		if ($program_name != 'All') $query_string .= " AND program_name = '".$program_name."'";
+	    	}
+	    	else
+	    	{
+	    		$query_string .= " WHERE date = '".$date."'";
+	    		
+	    		if ($duty_type != 'All') $query_string .= " AND duty_type = '".$duty_type."'";
+	    		if ($location != 'All') $query_string .= " AND location = '".$location."'";
+	    		if ($program_name != 'All') $query_string .= " AND program_name = '".$program_name."'";
+	    	}
+	    	
+	    	$query_string .= " AND user_id = ".$id;
+	    	$query_string .= " ORDER BY date ASC";
+	    	
+	    	//var_dump($query_string);
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$prog = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$id = intval($row['program_id']);
+	        	
+	        	$program[$id] = array(
+						           'id' => $id,
+						           'date' => $row['date'],
+						           'duty_type' => $row['duty_type'],
+						           'duty_start_time' => $row['duty_start_time'],
+						           'duty_end_time' => $row['duty_end_time'],
+						           'location' => $row['location'],
+						           'user_id' => intval($row['user_id']),
+						           'program_name' => $row['program_name']
+	        					   
+	        	);
+	        	
+	        	$prog["programs"][] = @$program[$id];
+	        	
+	        }
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	    
+	        if($prog)
+	        {
+	            $this->response($prog, 200); // 200 being the HTTP response code
+	        }
+	
+	        else
+	        {
+	            $this->response(array('error' => 'No program for this user.'), 404);
+	        }
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function populatesearch_get()
+	    {
+	    	
+	    	
+	    	
+	    	$id = $this->get('id');
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	
+	    	
+	    	
+	        
+	        
+	        // ------- DUTY TYPES -------
+	        
+	        $query_string = "SELECT * FROM declared_duties WHERE user_id = ".$id;
+	    	//var_dump($query_string);
+	    	
+	    	
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$duty_types = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$duty_types[] = array( 'user_id' => $row['user_id'], 'duty_type' => $row['duty_type']);
+	        	
+	        	
+	        }
+	        //var_dump($duty_types);
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        
+	        
+	        // ------- LOCATIONS -------
+	        
+	        $query_string = "SELECT * FROM declared_locations WHERE user_id = ".$id;
+	    	
+	    	
+	    	//var_dump($query_string);
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$locations = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$locations[] = array( 'user_id' => $row['user_id'], 'location' => $row['location']);
+	        	
+	        	
+	        }
+	        //var_dump($locations);
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        
+	        // ------- PROG NAMES -------
+	    	
+	    	$query_string  = "SELECT DISTINCT program_name FROM program WHERE user_id = ".$id;
+	    	
+	    	
+	    	//var_dump($query_string);
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$prognames = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$prognames[] = $row['program_name'];
+	        	
+	        }
+	        //var_dump($prognames);
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        
+	        
+	    	$this->response(array( 'duty_types' => $duty_types, 'locations' => $locations, 'program_names' => $prognames ), 200); // 200 being the HTTP response code
+	        
+	    	
+	    	
+	    	
+	    	
+	    }
+	    
 	    
 	    
 	    

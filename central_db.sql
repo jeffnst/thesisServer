@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 27, 2013 at 08:45 PM
+-- Generation Time: Aug 01, 2013 at 08:49 PM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.4.3
 
@@ -89,12 +89,14 @@ CREATE TABLE IF NOT EXISTS `change_list` (
 --
 
 INSERT INTO `change_list` (`id`, `user_id`, `request_date`, `request_start_time`) VALUES
-(1, 3, '2013-07-27', '23:15:34'),
+(1, 3, '2013-07-28', '15:49:49'),
 (2, 3, '0000-00-00', '18:34:24'),
 (3, 3, '2013-07-27', '19:06:38'),
-(4, 3, '2013-07-29', '19:08:03'),
+(4, 3, '2013-07-31', '14:40:11'),
 (6, 3, '2013-08-02', '18:45:04'),
-(7, 3, '2013-08-04', '11:43:28');
+(7, 3, '2013-08-28', '21:56:32'),
+(8, 3, '2013-07-29', '19:16:12'),
+(9, 3, '2013-08-08', '21:07:17');
 
 -- --------------------------------------------------------
 
@@ -118,8 +120,18 @@ CREATE TABLE IF NOT EXISTS `declared_duties` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `duty_type` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`),
+  KEY `duty_type` (`duty_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `declared_duties`
+--
+
+INSERT INTO `declared_duties` (`id`, `user_id`, `duty_type`) VALUES
+(1, 3, 'Βάρδια'),
+(2, 3, 'Εφημερία');
 
 -- --------------------------------------------------------
 
@@ -132,8 +144,16 @@ CREATE TABLE IF NOT EXISTS `declared_locations` (
   `user_id` int(11) NOT NULL,
   `location` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  KEY `location` (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `declared_locations`
+--
+
+INSERT INTO `declared_locations` (`id`, `user_id`, `location`) VALUES
+(1, 3, 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική');
 
 -- --------------------------------------------------------
 
@@ -186,8 +206,18 @@ CREATE TABLE IF NOT EXISTS `doctor_users` (
 CREATE TABLE IF NOT EXISTS `duties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `duty_name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id`),
+  KEY `duty_name` (`duty_name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `duties`
+--
+
+INSERT INTO `duties` (`id`, `duty_name`) VALUES
+(1, 'Βάρδια'),
+(2, 'Εφημερία'),
+(3, 'Καθημερινά Ιατρεία');
 
 -- --------------------------------------------------------
 
@@ -221,7 +251,8 @@ CREATE TABLE IF NOT EXISTS `locations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `location_name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `location_name` (`location_name`)
+  KEY `location_name` (`location_name`),
+  KEY `location_name_2` (`location_name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
@@ -301,8 +332,9 @@ CREATE TABLE IF NOT EXISTS `program` (
   `program_name` varchar(50) NOT NULL,
   PRIMARY KEY (`program_id`),
   KEY `user_id` (`user_id`),
-  KEY `location` (`location`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+  KEY `location` (`location`),
+  KEY `duty_type` (`duty_type`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
 
 --
 -- Dumping data for table `program`
@@ -315,7 +347,10 @@ INSERT INTO `program` (`program_id`, `date`, `duty_type`, `duty_start_time`, `du
 (4, '2013-07-04', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
 (6, '2013-07-25', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
 (7, '2013-08-03', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
-(8, '2013-07-22', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6');
+(8, '2013-07-22', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(9, '2013-07-30', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(10, '2013-07-31', 'Εφημερία', '12:00:00', '18:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Εφημερία -> 12-6'),
+(11, '2013-08-12', 'Βάρδια', '06:00:00', '12:00:00', 'Γενικό Νοσοκομείο Αθηνών - Πολυκλινική', 3, 'Βάρδια -> 6-12');
 
 -- --------------------------------------------------------
 
@@ -334,7 +369,7 @@ CREATE TABLE IF NOT EXISTS `stat_activity` (
 --
 
 INSERT INTO `stat_activity` (`num_of_queries`, `last_happened_on`) VALUES
-(1083, '2013-07-27 20:44:07');
+(1978, '2013-08-01 20:46:37');
 
 -- --------------------------------------------------------
 
@@ -438,14 +473,15 @@ ALTER TABLE `computer_staff`
 -- Constraints for table `declared_duties`
 --
 ALTER TABLE `declared_duties`
-  ADD CONSTRAINT `declared_duties_ibfk_1` FOREIGN KEY (`id`) REFERENCES `duties` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `declared_duties_ibfk_1` FOREIGN KEY (`id`) REFERENCES `duties` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `declared_duties_ibfk_2` FOREIGN KEY (`duty_type`) REFERENCES `duties` (`duty_name`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `declared_locations`
 --
 ALTER TABLE `declared_locations`
-  ADD CONSTRAINT `declared_locations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `declared_locations_ibfk_2` FOREIGN KEY (`id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `declared_locations_ibfk_2` FOREIGN KEY (`id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `declared_locations_ibfk_3` FOREIGN KEY (`location`) REFERENCES `locations` (`location_name`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `doctor_users`
@@ -478,7 +514,8 @@ ALTER TABLE `phone_numbers`
 --
 ALTER TABLE `program`
   ADD CONSTRAINT `program_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `program_ibfk_2` FOREIGN KEY (`location`) REFERENCES `locations` (`location_name`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `program_ibfk_2` FOREIGN KEY (`location`) REFERENCES `locations` (`location_name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `program_ibfk_4` FOREIGN KEY (`duty_type`) REFERENCES `declared_duties` (`duty_type`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `update_user`
