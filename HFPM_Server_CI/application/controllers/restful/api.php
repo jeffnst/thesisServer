@@ -483,8 +483,19 @@ class Api extends REST_Controller
 			$con = connect_db('central_db');
 			
 	    	// main query
-	    	$query_string  = "INSERT INTO `change_list` VALUES(".$id.", ".$user_id.", '".$request_date."', '".$request_start_time."')";
-	    	$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date."', `request_start_time`='".$request_start_time."'";
+	    	if ($request_start_time == 'Any')
+	    	{
+	    		$query_string  = "INSERT INTO `change_list` (`id`, `user_id`, `request_date`, `request_start_time`) VALUES(".$id.", ".$user_id.", '".$request_date."', NULL)";
+	    		$query_string .= " ON DUPLICATE KEY UPDATE `request_date`='".$request_date."', `request_start_time`=NULL;";
+	    	}
+	    	else
+	    	{
+	    		$query_string  = "INSERT INTO `change_list` (`id`, `user_id`, `request_date`, `request_start_time`) VALUES(".$id.", ".$user_id.", '".$request_date."', '".$request_start_time."')";
+	    		$query_string .= " ON DUPLICATE KEY UPDATE `request_date`='".$request_date."', `request_start_time`='".$request_start_time."';";
+	    	}
+	    	
+	    	var_dump($query_string);
+	    	
 	    	$con->query($query_string);
 	    	
 	        // increase queries (testing purposes)
@@ -492,7 +503,7 @@ class Api extends REST_Controller
 	        $con->query($query_string);
 	        
 	        
-	    // define query
+	    	// define query
 	        $query_string = "SELECT * FROM change_list WHERE id = '".$id."'";
 	        //var_dump($query_string);
 	        // execute query
@@ -532,7 +543,7 @@ class Api extends REST_Controller
 	    
 	        if($list)
 	        {
-	        	 $list['message'] = 'InsertedOrUpdated'; 
+	        	$list['message'] = 'InsertedOrUpdated'; 
 	            $this->response($list, 200); // 200 being the HTTP response code
 	        }
 	
@@ -816,6 +827,357 @@ class Api extends REST_Controller
 	    	
 	    	
 	    	
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function populatesettings_get()
+	    {
+	    	
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	
+	    	
+	    	
+	        
+	        
+	        // ------- DEPARTMENTS -------
+	        
+	        $query_string = "SELECT * FROM departments";;
+	    	//var_dump($query_string);
+	    	
+	    	
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$departments = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$departments[] = array( 'department_name' => $row['department_name']);
+	        	
+	        	
+	        }
+	        //var_dump($duty_types);
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        
+	        
+	        // ------- DUTY_TYPES -------
+	        
+	        $query_string = "SELECT * FROM duties";
+	    	
+	    	
+	    	//var_dump($query_string);
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$locations = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$duties[] = array( 'duty_name' => $row['duty_name']);
+	        	
+	        	
+	        }
+	        //var_dump($locations);
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	    	$this->response(array( 'departments' => $departments, 'duties' => $duties ), 200); // 200 being the HTTP response code
+	        
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function populatedeclared_get()
+	    {
+	    	
+	    	
+	    	$id = $this->get('id');
+	    	
+	    	$con = connect_db('central_db');
+	    	
+	    	
+	        $query_string  = "SELECT p.program_id, u.name_user, u.surname_user, p.duty_type, u.department, p.date, p.duty_start_time, p.duty_end_time, cl.request_date, cl.request_start_time";
+	        $query_string .= " FROM change_list AS cl";
+	        $query_string .= " INNER JOIN users AS u ON u.user_id=cl.user_id";
+	        $query_string .= " INNER JOIN program AS p ON p.program_id=cl.id";
+	        $query_string .= " WHERE u.user_id!=".$id;
+	    	
+	    	
+	    	// perform query
+	    	$result = $con->query($query_string);
+	    	
+	    	$duties = array();
+	        
+	        // fetch results (one or none entry)
+	        while ($row = $result->fetch_array())
+	        {
+	        	
+	        	$duties[] = array(  'name' => $row['name_user'],
+	        						'surname' => $row['surname_user'],
+	        						'program_id' => $row['program_id'],
+	        						'type' => $row['duty_type'],
+		        					'department' => $row['department'],
+	        						'date' => $row['date'],
+	        						'start' => $row['duty_start_time'],
+	        						'end' => $row['duty_end_time'],
+	        						'req_date' => $row['request_date'],
+	        						'req_time' => $row['request_start_time']
+	        	);
+	        	
+	        	
+	        }
+	        //var_dump($duty_types);
+	        
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	    	$this->response( array('duties' => $duties), 200); // 200 being the HTTP response code
+	        
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function populatedutiesavail_get()
+	    {
+	    	
+	    		    	
+	    	$i=0;
+	    	$con = connect_db('central_db');
+	    	
+	    	
+	        $query_string  = "SELECT cl.id, cl.request_date, cl.request_start_time, p.duty_type, p.location FROM change_list AS cl";
+			$query_string .= " INNER JOIN program AS p ON p.program_id=cl.id";
+			$query_string .= " WHERE cl.id=".$this->get('dutyid');
+			$result = $con->query($query_string);
+	    	
+			while ($change_list = $result->fetch_array())
+			{			
+				
+				
+				$query_string  = "SELECT u.name_user, u.surname_user, u.department, p.location, p.duty_type, p.date, p.duty_start_time, p.duty_end_time, p.program_id FROM program AS p";
+				$query_string .= " INNER JOIN users AS u ON u.user_id=p.user_id";
+				$query_string .= " WHERE p.date='".$change_list['request_date']."'";
+				$query_string .= " AND p.duty_type='".$change_list['duty_type']."'";
+				$query_string .= " AND p.location='".$change_list['location']."'";
+				if ($change_list['request_start_time'] != NULL)
+				{
+					$query_string .= " AND duty_start_time='".$change_list['request_start_time']."'";
+				}
+				$result2 = $con->query($query_string);
+				
+				
+				while ($program = $result2->fetch_array())
+				{
+		        	
+		        	$duties[] = array(  'program_id' => intval($program['program_id']),
+		        						'type' => $program['duty_type'],
+		        						'date' => $program['date'],
+		        						'start' => $program['duty_start_time'],
+		        						'end' => $program['duty_end_time']
+		        	);
+		        	
+		        	$i++;
+		        }
+		        
+			}
+	        //var_dump($duty_types);
+	        
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	    	if ($i) $this->response( array('duties' => $duties), 200); // 200 being the HTTP response code
+	    	else $this->response( array('duties' => array ( array(  'program_id' => 0) ) ), 200); // 200 being the HTTP response code
+	        
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function exchangeduties_get()
+	    {
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	
+	    	
+	        // ********************* BEFORE *********************** //
+			
+			$query_string  = "SELECT date, duty_start_time, duty_end_time, user_id FROM program";
+			$query_string .= " WHERE program_id=".$this->get('from');
+			$result = $con->query($query_string);
+			
+			while ($before = $result->fetch_array())
+			{
+				$before_date = $before['date'];
+				$before_start = $before['duty_start_time'];
+				$before_end = $before['duty_end_time'];
+				$before_user_id = $before['user_id'];
+			}
+			
+			
+			// ********************* AFTER *********************** //
+			
+			$query_string  = "SELECT date, duty_start_time, duty_end_time, user_id FROM program";
+			$query_string .= " WHERE program_id=".$this->get('to');
+			$result2 = $con->query($query_string);
+			
+			while ($after = $result2->fetch_array())
+			{
+				$after_date = $after['date'];
+				$after_start = $after['duty_start_time'];
+				$after_end = $after['duty_end_time'];
+				$after_user_id = $after['user_id'];
+			}
+			
+			
+			
+			
+			
+			
+			// ******************* EXCHANGE ******************** //
+			
+			$query_string  = "UPDATE program SET date='".$after_date."', duty_start_time='".$after_start."', duty_end_time='".$after_end."'";
+			$query_string .= " WHERE program_id=".$this->get('from');
+			$con->query($query_string);
+			
+			$query_string  = "UPDATE program SET date='".$before_date."', duty_start_time='".$before_start."', duty_end_time='".$before_end."'";
+			$query_string .= " WHERE program_id=".$this->get('to');
+			$con->query($query_string);
+			
+			
+			$query_string  = "DELETE FROM change_list";
+			$query_string .= " WHERE id=".$this->get('from');
+			$con->query($query_string);
+			
+			
+			
+			
+			
+			// ******************** NOTIFY *********************** //
+			
+			$query_string  = "INSERT INTO notify_user VALUES (NULL, ".$before_user_id.", ".$this->get('from').", 0, 'Request fulfilled and duty exchanged with another user's.')";
+			$con->query($query_string);
+	        
+	        
+	        
+	        // increase number of queries (tracking pusposes)
+	        //$query_string = "TRUNCATE `stat_activity`;";
+	        //$con->query($query_string);
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	    	$this->response( array( 'error' => 'none' ), 200); // 200 being the HTTP response code
+	        
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    function notifications_get()
+	    {
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	$id = $this->get('id');
+	    	
+	    	
+	        // ********************* BEFORE *********************** //
+			
+			$query_string  = "SELECT * FROM notify_user WHERE user_id=".$id;
+			$result = $con->query($query_string);
+			
+			
+			while ($notifications = $result->fetch_array())
+			{
+				$prog_id[] = intval($notifications['program_id']);
+				$isSecretary[] = intval($notifications['isSecretary']);
+				$description[] = $notifications['description'];
+			}
+			
+			
+			
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        $query_string  = "DELETE FROM notify_user WHERE user_id=".$id;
+			$result = $con->query($query_string);
+	    	
+	        if (isset($prog_id))
+	        {
+	        	$this->response( array( 'program_id' => $prog_id,
+	        							'isSecretary' => $isSecretary,
+	        							'description' => $description,
+	        							'error' => "" )
+	        					, 200); // 200 being the HTTP response code
+	        }
+	        else
+	        {
+	        	$this->response( array( 'error' => "No notifications for this user" ), 200); // 200 being the HTTP response code
+	        }
+	        
 	    	
 	    }
 	    
