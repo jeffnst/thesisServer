@@ -88,6 +88,11 @@ class Api extends REST_Controller
 	    
 	        if($user)
 	        {
+	        	
+	        	$query_string = "INSERT INTO users_logged_in VALUES( ".$id." , 1 )";
+	        	$query_string .= " ON DUPLICATE KEY UPDATE logged = 1";
+	        	$con->query($query_string);
+	        	
 	            $this->response($user, 200); // 200 being the HTTP response code
 	        }
 	
@@ -494,7 +499,7 @@ class Api extends REST_Controller
 	    		$query_string .= " ON DUPLICATE KEY UPDATE `request_date`='".$request_date."', `request_start_time`='".$request_start_time."';";
 	    	}
 	    	
-	    	var_dump($query_string);
+	    	var_dump($request_start_time);
 	    	
 	    	$con->query($query_string);
 	    	
@@ -594,9 +599,18 @@ class Api extends REST_Controller
 			
 			for ($i=0; $i<$size; $i++)
 			{
-		    	// main query
-		    	$query_string  = "INSERT INTO `change_list` VALUES(".$id[$i].", ".$user_id[$i].", '".$request_date[$i]."', '".$request_start_time[$i]."')";
-		    	$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date[$i]."', `request_start_time`='".$request_start_time[$i]."'";
+		    	
+				if ($request_start_time[$i] == 'Any')
+				{
+					$query_string  = "INSERT INTO `change_list` VALUES(".$id[$i].", ".$user_id[$i].", '".$request_date[$i]."', NULL)";
+		    		$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date[$i]."', `request_start_time`=NULL";
+				}
+				else
+				{
+					$query_string  = "INSERT INTO `change_list` VALUES(".$id[$i].", ".$user_id[$i].", '".$request_date[$i]."', '".$request_start_time[$i]."')";
+		    		$query_string .= "ON DUPLICATE KEY UPDATE `request_date`='".$request_date[$i]."', `request_start_time`='".$request_start_time[$i]."'";
+				}
+		    	
 		    	$con->query($query_string);
 		    	
 		        // increase queries (testing purposes)
@@ -1143,8 +1157,18 @@ class Api extends REST_Controller
 	    	$con = connect_db('central_db');
 	    	$id = $this->get('id');
 	    	
+	    	/*
+	    	$username = $this->get('username');
 	    	
-	        // ********************* BEFORE *********************** //
+	    	
+			$query_string = "SELECT user_id FROM users WHERE username='".$username."'";
+			$result = $con->query($query_string);
+	    	
+	    	while ($row = $result->fetch_array())
+			{
+				$id = $row['user_id'];
+			}
+	    	*/
 			
 			$query_string  = "SELECT * FROM notify_user WHERE user_id=".$id;
 			$result = $con->query($query_string);
@@ -1163,13 +1187,36 @@ class Api extends REST_Controller
 	        $con->query($query_string);
 	        
 	        $query_string  = "DELETE FROM notify_user WHERE user_id=".$id;
-			$result = $con->query($query_string);
+			$con->query($query_string);
 	    	
+			
+			
+			
+			
 	        if (isset($prog_id))
 	        {
+	        	
+		        for ($i=0; $i<count($prog_id); $i++)
+				{
+			    	$query_string  = "SELECT * FROM program WHERE program_id=".$prog_id[$i];
+					$result = $con->query($query_string);
+					
+					
+					while ($dates_and_times = $result->fetch_array())
+					{
+						$date[] = $dates_and_times['date'];
+						$start_time[] = $dates_and_times['duty_start_time'];
+						$end_time[] = $dates_and_times['duty_end_time'];
+					}
+				}
+				
+				
 	        	$this->response( array( 'program_id' => $prog_id,
 	        							'isSecretary' => $isSecretary,
 	        							'description' => $description,
+	        							'date' => $date,
+	        							'start_time' => $start_time,
+	        							'end_time' => $end_time,
 	        							'error' => "" )
 	        					, 200); // 200 being the HTTP response code
 	        }
@@ -1181,6 +1228,27 @@ class Api extends REST_Controller
 	    	
 	    }
 	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+		function logout_get()
+	    {
+	        
+	        $id = $this->get('id');
+	        
+	        $con = connect_db('central_db');
+	        $query_string = "INSERT INTO users_logged_in VALUES( ".$id." , 0 )";
+	        $query_string .= " ON DUPLICATE KEY UPDATE logged = 0";
+	        $con->query($query_string);
+	        
+	        $this->response(array('message' => 'OK'), 404);
+	        
+	    }
 	    
 	    
 	    
