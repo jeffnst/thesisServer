@@ -808,7 +808,7 @@ class Api extends REST_Controller
 	        
 	        // ------- PROG NAMES -------
 	    	
-	    	$query_string  = "SELECT DISTINCT program_name FROM program WHERE user_id = ".$id;
+	    	$query_string  = "SELECT DISTINCT program_name FROM program WHERE date >= NOW() AND user_id = ".$id;
 	    	
 	    	
 	    	//var_dump($query_string);
