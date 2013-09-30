@@ -1236,6 +1236,90 @@ class Api extends REST_Controller
 	    
 	    
 	    
+	    function notificationsnodelete_get()
+	    {
+	    	
+	    	
+	    	$con = connect_db('central_db');
+	    	$username = $this->get('username');
+	    	
+			$query_string = "SELECT user_id FROM users WHERE username='".$username."'";
+			$result = $con->query($query_string);
+	    	
+	    	while ($row = $result->fetch_array())
+			{
+				$id = $row['user_id'];
+			}
+	    	
+			
+			$query_string  = "SELECT * FROM notify_user WHERE user_id=".$id;
+			$result = $con->query($query_string);
+			
+			
+			while ($notifications = $result->fetch_array())
+			{
+				$prog_id[] = intval($notifications['program_id']);
+				$isSecretary[] = intval($notifications['isSecretary']);
+				$description[] = $notifications['description'];
+			}
+			
+			
+			
+	        $query_string = "UPDATE `stat_activity` SET `num_of_queries`=`num_of_queries`+1, `last_happened_on`=CURRENT_TIMESTAMP;";
+	        $con->query($query_string);
+	        
+	        
+	        // DO NOT DELETE //
+	        //$query_string  = "DELETE FROM notify_user WHERE user_id=".$id;
+			//$con->query($query_string);
+	    	
+			
+			
+			
+			
+	        if (isset($prog_id))
+	        {
+	        	
+		        for ($i=0; $i<count($prog_id); $i++)
+				{
+			    	$query_string  = "SELECT * FROM program WHERE program_id=".$prog_id[$i];
+					$result = $con->query($query_string);
+					
+					
+					while ($dates_and_times = $result->fetch_array())
+					{
+						$date[] = $dates_and_times['date'];
+						$start_time[] = $dates_and_times['duty_start_time'];
+						$end_time[] = $dates_and_times['duty_end_time'];
+					}
+				}
+				
+				
+	        	$this->response( array( 'program_id' => $prog_id,
+	        							'isSecretary' => $isSecretary,
+	        							'description' => $description,
+	        							'date' => $date,
+	        							'start_time' => $start_time,
+	        							'end_time' => $end_time,
+	        							'error' => "" )
+	        					, 200); // 200 being the HTTP response code
+	        }
+	        else
+	        {
+	        	$this->response( array( 'error' => "No notifications for this user" ), 200); // 200 being the HTTP response code
+	        }
+	        
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
 		function logout_get()
 	    {
 	        
